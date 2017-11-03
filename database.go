@@ -49,16 +49,61 @@ func insertItem(credit bool, day int, month int, year int, name string, withdraw
         fmt.Println("shit")
         return
     }
-    res, err := stmt.Exec(cre, day, month, year, name, withdraw, deposit)
+    //res, err := stmt.Exec(cre, day, month, year, name, withdraw, deposit)
+    _, err = stmt.Exec(cre, day, month, year, name, withdraw, deposit)
     if err != nil {
         fmt.Println("sshit")
         return
     }
+    /*
     id, err := res.LastInsertId()
     if err != nil {
         fmt.Println("sshit")
         return
     }
+    */
 }
+
+func queryItem(sd, sm, sy, ed, em, ey int) {
+
+    //select * from items where day >= start and day <= end and month >= m
+    condition1 := "where day >= ? and month >= ? and year >=?"
+    condition2 := "where day <= ? and month <= ? and year <=?"
+    query := "select * from items " + condition1 + " and " + condition2
+    rows, err := db.Query(query, sd, sm, sy, ed, em, ey)
+    if err != nil {
+        fmt.Println(err)
+    }
+    var name string
+    var withdraw float64
+    var deposit float64
+
+    for rows.Next() {
+        err = rows.Scan(&name, &withdraw, &deposit)
+        println(name, withdraw, deposit)
+    }
+
+
+    rows.Close()
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
