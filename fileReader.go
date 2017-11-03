@@ -10,6 +10,21 @@ import (
 )
 
 
+//Given a string in mm/dd/yyy format, it will return a list of integers
+// containing above values in the order
+func parseDate(date string) [3]int {
+    str_dates := strings.Split(date, "/")
+    var int_dates [3]int
+
+    for i:=0; i<len(str_dates); i++ {
+        int_dates[i], _ = strconv.Atoi(str_dates[i])
+    }
+
+    return int_dates
+
+}
+
+
 //returns sqllike query hopefully..
 func parseLine(line string) {
     //MM/DD/YYYY, NAME,withrdaw,Deposit,total
@@ -18,7 +33,9 @@ func parseLine(line string) {
         fmt.Println("ERROR")
         //throw an exception?
     }
-    dates := strings.Split(s_line[0], "/")
+
+    int_dates := parseDate(s_line[0])
+
     name := s_line[1]
     var withdraw float64
     var deposit float64
@@ -38,7 +55,11 @@ func parseLine(line string) {
         deposit = val;
     }
 
-    fmt.Println(dates, name, withdraw, deposit)
+    fmt.Println(int_dates, name, withdraw, deposit)
+    //insertItem(false, int_dates[0], int_dates[1], int_dates[2], name, withdraw, deposit)
+
+
+
 }
 
 func readFile(file_location string) {
@@ -59,6 +80,8 @@ func readFile(file_location string) {
 }
 
 
+/*
+
 func main() {
     stat, err := os.Stat(os.Args[1])
     if err != nil {
@@ -75,7 +98,6 @@ func main() {
     readFile(os.Args[1])
 }
 
-
-
+*/
 
 
