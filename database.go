@@ -65,11 +65,11 @@ func insertItem(credit bool, day int, month int, year int, name string, withdraw
 }
 
 func queryItem(sd, sm, sy, ed, em, ey int) {
-
+    fmt.Println(sd, sm, sy, ed, em, ey)
     //select * from items where day >= start and day <= end and month >= m
-    condition1 := "where day >= ? and month >= ? and year >=?"
-    condition2 := "where day <= ? and month <= ? and year <=?"
-    query := "select * from items " + condition1 + " and " + condition2
+    condition1 := "day >= ? and month >= ? and year >=?"
+    condition2 := "day <= ? and month <= ? and year <=?"
+    query := "SELECT * FROM items WHERE " + condition1 + " and " + condition2
     rows, err := db.Query(query, sd, sm, sy, ed, em, ey)
     if err != nil {
         fmt.Println(err)

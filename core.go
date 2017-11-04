@@ -3,7 +3,6 @@ package main
 import (
     "fmt"
     "time"
-
 )
 
 type DateParms struct {
@@ -32,6 +31,9 @@ func getDataDateRange(dateRange RangeParms) {
     }
 
     fmt.Println(dateRange)
+    queryItem(dateRange.start.day, dateRange.start.month, dateRange.start.year, 
+                dateRange.end.day, dateRange.end.month, dateRange.end.year)
+//func queryItem(sd, sm, sy, ed, em, ey int) {
 
 }
 
@@ -41,7 +43,7 @@ func main() {
     //fmt.Println("current time is ", current_time.Format("01/02/2006"))  //what the heck golang? placeholder???
 
     start := DateParms{1, 20, 2000}
-    end := DateParms{5, 15, 2001}
+    end := DateParms{5, 15, 2019}
 
     test1 := RangeParms{start, DateParms{}}
     test2 := RangeParms{start, end}
