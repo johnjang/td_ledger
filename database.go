@@ -12,30 +12,23 @@ var db *sql.DB
 func init() {
     var err error
     db, err = sql.Open("sqlite3", "/opt/playground/ledger/data/sql/ledger.db")
-    if err != nil {
-        //log error and...?
-        fmt.Println(err)
-    }
-    if err = db.Ping(); err != nil {
-        fmt.Println(err)
-    }
+    handleError(err)
+    err = db.Ping()
+    handleError(err)
 }
 
 
-/*
 func main() {
-    rows, _ := db.Query("select name from items")
-    var name string
-    for rows.Next() {
-        rows.Scan(&name)
-        fmt.Println(name)
-    }
-    insertItem(true , 30,1,1514,"test2", 5.12, 3.0)
+    date1 := "10-25-2017"
+    date2 := "10-26-2017"
+    name := "FALAFEL KING"
+    fmt.Println(queryItemDateRange(date1, date2))
+    fmt.Println(queryItemName(name))
+    fmt.Println(queryItemNameDateRange(name, date1, date2))
 }
-*/
 
 
-func insertItem(credit bool, day int, month int, year int, name string, withdraw float64, deposit float64) {
+func insertItem(credit bool, date string, name string, withdraw float64, deposit float64) {
     if db == nil {
         fmt.Println("database error...")
     }
@@ -44,66 +37,77 @@ func insertItem(credit bool, day int, month int, year int, name string, withdraw
         cre = 1
     }
 
-    stmt, err := db.Prepare ("INSERT INTO items (id, day, month, year, name, withdraw, deposit) values (?, ?, ?, ?, ?, ?, ?)")
-    if err != nil {
-        fmt.Println("shit")
-        return
-    }
-    //res, err := stmt.Exec(cre, day, month, year, name, withdraw, deposit)
-    _, err = stmt.Exec(cre, day, month, year, name, withdraw, deposit)
-    if err != nil {
-        fmt.Println("sshit")
-        return
-    }
-    /*
-    id, err := res.LastInsertId()
-    if err != nil {
-        fmt.Println("sshit")
-        return
-    }
-    */
+    stmt, err := db.Prepare ("INSERT INTO items (date, name, withdraw, deposit, id) values (?, ?, ?, ?, ?)")
+    handleError(err)
+    _, err = stmt.Exec(date, name, withdraw, deposit, cre)
+    handleError(err)
 }
 
-func queryItem(sd, sm, sy, ed, em, ey int) {
-    fmt.Println(sd, sm, sy, ed, em, ey)
-    //select * from items where day >= start and day <= end and month >= m
-    condition1 := "day >= ? and month >= ? and year >=?"
-    condition2 := "day <= ? and month <= ? and year <=?"
-    query := "SELECT * FROM items WHERE " + condition1 + " and " + condition2
-    rows, err := db.Query(query, sd, sm, sy, ed, em, ey)
+
+//QUERY 
+func queryItemDateStart(start string) [][5]string {
+    query := "SELECT * FROM items where date >= ?"
+    rows, err := db.Query(query, start)
+    handleError(err)
+
+    return rowResult(rows)
+}
+
+
+func queryItemDateEnd(end string) [][5]string {
+    query := "SELECT * FROM items where date <= ?"
+    rows, err := db.Query(query, end)
+    handleError(err)
+
+    return rowResult(rows)
+}
+
+func queryItemDateRange(start, end string) [][5]string {
+    query := "SELECT * FROM items where date >= ? and date <= ?"
+    rows, err := db.Query(query, start, end)
+    handleError(err)
+
+    return rowResult(rows)
+}
+
+func queryItemName(name string) [][5]string {
+    query := "SELECT * FROM items where name = ?"
+    rows, err := db.Query(query, name)
+    handleError(err)
+
+    return rowResult(rows)
+}
+
+func queryItemNameDateRange(name, start, end string) [][5]string {
+    query := "SELECT * FROM items where name = ? and date >= ? and date <= ?"
+    rows, err := db.Query(query, name, start, end)
+    handleError(err)
+    return rowResult(rows)
+
+}
+
+func handleError(err error) {
     if err != nil {
         fmt.Println(err)
     }
-    var name string
-    var withdraw float64
-    var deposit float64
-
-    for rows.Next() {
-        err = rows.Scan(&name, &withdraw, &deposit)
-        println(name, withdraw, deposit)
-    }
-
-
-    rows.Close()
-
 }
 
+func rowResult(rows *sql.Rows) [][5]string {
+    var err error
+    var res = [][5]string{}
 
+    for rows.Next() {
+        var date string
+        var name string
+        var withdraw string
+        var deposit string
+        var id string
+        err = rows.Scan(&date, &name, &withdraw, &deposit, &id)
+        handleError(err)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        res = append(res, [5]string{date, name, withdraw, deposit, id})
+    }
+    rows.Close()
+    return res
+}
 
