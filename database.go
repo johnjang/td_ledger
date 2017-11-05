@@ -17,7 +17,7 @@ func init() {
     handleError(err)
 }
 
-
+/*
 func main() {
     date1 := "10-25-2017"
     date2 := "10-26-2017"
@@ -26,6 +26,7 @@ func main() {
     fmt.Println(queryItemName(name))
     fmt.Println(queryItemNameDateRange(name, date1, date2))
 }
+*/
 
 
 func insertItem(credit bool, date string, name string, withdraw float64, deposit float64) {
