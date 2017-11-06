@@ -67,7 +67,7 @@ func readFile(file_location string) {
     }
 }
 
-
+/*
 func main() {
     stat, err := os.Stat(os.Args[1])
     if err != nil {
@@ -83,6 +83,7 @@ func main() {
 
     readFile(os.Args[1])
 }
+*/
 
 
 

@@ -11,7 +11,7 @@ import (
 var db *sql.DB
 func init() {
     var err error
-    db, err = sql.Open("sqlite3", "/opt/playground/ledger/data/sql/ledger.db")
+    db, err = sql.Open("sqlite3", "/opt/playground/td_ledger/data/sql/ledger.db")
     handleError(err)
     err = db.Ping()
     handleError(err)
@@ -46,8 +46,9 @@ func insertItem(credit bool, date string, name string, withdraw float64, deposit
 
 
 //QUERY 
+//order by date DESC
 func queryItemDateStart(start string) [][5]string {
-    query := "SELECT * FROM items where date >= ?"
+    query := "SELECT * FROM items where date >= ? ORDER BY date DESC"
     rows, err := db.Query(query, start)
     handleError(err)
 
@@ -56,7 +57,7 @@ func queryItemDateStart(start string) [][5]string {
 
 
 func queryItemDateEnd(end string) [][5]string {
-    query := "SELECT * FROM items where date <= ?"
+    query := "SELECT * FROM items where date <= ? ORDER BY date DESC"
     rows, err := db.Query(query, end)
     handleError(err)
 
@@ -64,7 +65,7 @@ func queryItemDateEnd(end string) [][5]string {
 }
 
 func queryItemDateRange(start, end string) [][5]string {
-    query := "SELECT * FROM items where date >= ? and date <= ?"
+    query := "SELECT * FROM items where date >= ? and date <= ? ORDER BY date DESC"
     rows, err := db.Query(query, start, end)
     handleError(err)
 
@@ -72,7 +73,7 @@ func queryItemDateRange(start, end string) [][5]string {
 }
 
 func queryItemName(name string) [][5]string {
-    query := "SELECT * FROM items where name = ?"
+    query := "SELECT * FROM items where name = ? ORDER BY date DESC"
     rows, err := db.Query(query, name)
     handleError(err)
 
@@ -80,7 +81,7 @@ func queryItemName(name string) [][5]string {
 }
 
 func queryItemNameDateRange(name, start, end string) [][5]string {
-    query := "SELECT * FROM items where name = ? and date >= ? and date <= ?"
+    query := "SELECT * FROM items where name = ? and date >= ? and date <= ? ORDER BY date DESC"
     rows, err := db.Query(query, name, start, end)
     handleError(err)
     return rowResult(rows)

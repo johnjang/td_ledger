@@ -1,69 +1,75 @@
 package main
 
 import (
-    "encoding/json"
     "log"
     "net/http"
-
+    "fmt"
     "github.com/gorilla/mux"
+    "strings"
 )
 
-type Person struct {
-    ID        string   `json:"id,omitempty"`
-    Firstname string   `json:"firstname,omitempty"`
-    Lastname  string   `json:"lastname,omitempty"`
-    Address   *Address `json:"address,omitempty"`
-}
-
-type Address struct {
-    City  string `json:"city,omitempty"`
-    State string `json:"state,omitempty"`
-}
-
-var people []Person
-
-func GetPersonEndpoint(w http.ResponseWriter, req *http.Request) {
-    params := mux.Vars(req)
-    for _, item := range people {
-        if item.ID == params["id"] {
-            json.NewEncoder(w).Encode(item)
-            return
+/*
+change YYYY-MM-DD or
+       DD-MM-YYYY or
+       MM-DD it will assume to be a day and month of current year
+       DD,  it will assume to be a day with current monty and year or
+        into 
+       MM-DD-YYYY format
+*/
+func parseDate(date string) string {
+    /*
+        it is DD-MM-YYYY or YYYY-MM-DD
+    */
+    if len(date)==10 {
+        date := strings.Split(date, "-")
+        if len(date[0]) == 4 {  //YYYY-MM-DD format
+            return date[1] + "-" + date[2] + "-" + date[0]
+        } else { //DD-MM-YYYY format
+            return date[1] + "-" + date[0] + "-" + date[2]
         }
     }
-    json.NewEncoder(w).Encode(&Person{})
+    return "none"
 }
 
-func GetPeopleEndpoint(w http.ResponseWriter, req *http.Request) {
-    json.NewEncoder(w).Encode(people)
+func dateStart(w http.ResponseWriter, req *http.Request) {
+    start := mux.Vars(req)["start"]
+    start = parseDate(start)
+    result := inputDateStart(start)
+
+    w.Write([]byte(result))
 }
 
-func CreatePersonEndpoint(w http.ResponseWriter, req *http.Request) {
-    params := mux.Vars(req)
-    var person Person
-    _ = json.NewDecoder(req.Body).Decode(&person)
-    person.ID = params["id"]
-    people = append(people, person)
-    json.NewEncoder(w).Encode(people)
+func dateStartEnd(w http.ResponseWriter, req *http.Request) {
+    start := mux.Vars(req)["start"]
+    start = parseDate(start)
+
+    end := mux.Vars(req)["end"]
+    end = parseDate(end)
+
+    result := inputDateRange(start, end)
+
+    w.Write([]byte(result))
 }
 
-func DeletePersonEndpoint(w http.ResponseWriter, req *http.Request) {
-    params := mux.Vars(req)
-    for index, item := range people {
-        if item.ID == params["id"] {
-            people = append(people[:index], people[index+1:]...)
-            break
-        }
-    }
-    json.NewEncoder(w).Encode(people)
-}
+
 
 func main() {
+    fmt.Println("MUX started...")
     router := mux.NewRouter()
-    people = append(people, Person{ID: "1", Firstname: "Nic", Lastname: "Raboy", Address: &Address{City: "Dublin", State: "CA"}})
-    people = append(people, Person{ID: "2", Firstname: "Maria", Lastname: "Raboy"})
-    router.HandleFunc("/people", GetPeopleEndpoint).Methods("GET")
-    router.HandleFunc("/people/{id}", GetPersonEndpoint).Methods("GET")
-    router.HandleFunc("/people/{id}", CreatePersonEndpoint).Methods("POST")
-    router.HandleFunc("/people/{id}", DeletePersonEndpoint).Methods("DELETE")
-    log.Fatal(http.ListenAndServe(":12345", router))
+    router.HandleFunc("/ledger/date/{start}", dateStart).Methods("GET")
+    router.HandleFunc("/ledger/date/{start}/{end}", dateStartEnd).Methods("GET")
+    log.Fatal(http.ListenAndServe(":8080", router))
 }
+
+
+/*
+
+//curl -X GET "http://127.0.0.1:8080/hellotestt?arg1=this"
+    end := req.FormValue("end")
+    if end != "" {
+        end = parseDate(end)
+    }
+    fmt.Println(end)
+    w.Write([]byte("hello\nworld"))
+
+*/
