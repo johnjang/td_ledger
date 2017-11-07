@@ -1,0 +1,12 @@
+[Unit]
+Description=A personal API service, currently hosting ledger service only
+After=network.target auditd.service
+
+[Service]
+ExecStart=/opt/playground/td_ledger/webServer.go
+ExecReload=
+KillMode=
+Restart=on-failure
+
+[Install]
+Alias=sshd.service
