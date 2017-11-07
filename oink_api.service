@@ -3,7 +3,8 @@ Description=A personal API service, currently hosting ledger service only
 After=network.target auditd.service
 
 [Service]
-ExecStart=/opt/playground/td_ledger/webServer.go
+ExecStart=/opt/playground/td_ledger/td_ledger
+ExecStartPre=go build /opt/playground/td_ledger/src/github.com/johnjang/td_ledger
 ExecReload=
 KillMode=
 Restart=on-failure
