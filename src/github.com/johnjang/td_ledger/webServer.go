@@ -51,6 +51,23 @@ func dateStartEnd(w http.ResponseWriter, req *http.Request) {
     w.Write([]byte(result))
 }
 
+func addCategory(w http.ResponseWriter, req *http.Response) {
+    //add caregory
+    item := mux.Vars(req)["item"]
+    if !queryItem(item) {
+        w.Write([]byte("Given item not found..."))
+        return
+    }
+    category := mux.Vars(req)["category"]
+    addCategory(item, mux.Vars(req)["category"])
+
+
+}
+
+func addCategory(w http.ResponseWriter, req *http.Response) {
+    //Delete category
+
+}
 
 
 func main() {
@@ -58,6 +75,9 @@ func main() {
     router := mux.NewRouter()
     router.HandleFunc("/ledger/date/{start}", dateStart).Methods("GET")
     router.HandleFunc("/ledger/date/{start}/{end}", dateStartEnd).Methods("GET")
+    router.HandleFunc("/ledger/add/category/{item}/{category}", addCategory).Methods("PUT")
+    router.HandleFunc("/ledger/delete/category/{item}/{category}", deleteCategory).Methods("DELETE")
+
     log.Fatal(http.ListenAndServe(":8080", router))
 }
 
