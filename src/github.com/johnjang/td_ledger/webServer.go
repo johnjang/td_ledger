@@ -1,6 +1,7 @@
 package main
 
 import (
+    "bytes"
     "log"
     "net/http"
     "fmt"
@@ -51,21 +52,34 @@ func dateStartEnd(w http.ResponseWriter, req *http.Request) {
     w.Write([]byte(result))
 }
 
-func addCategory(w http.ResponseWriter, req *http.Response) {
+func addCategory(w http.ResponseWriter, req *http.Request) {
     //add caregory
     item := mux.Vars(req)["item"]
     if !queryItem(item) {
         w.Write([]byte("Given item not found..."))
         return
     }
-    category := mux.Vars(req)["category"]
-    addCategory(item, mux.Vars(req)["category"])
+    insertCategory(item, mux.Vars(req)["category"])
 
-
+    w.Write([]byte("done"))
 }
 
-func addCategory(w http.ResponseWriter, req *http.Response) {
-    //Delete category
+func listCategory(w http.ResponseWriter, req *http.Request) {
+    name := mux.Vars(req)["name"]
+
+    var res bytes.Buffer
+    if !queryItem(name) {
+        res.WriteString("no such item...")
+    } else {
+        res.WriteString(queryCategoriesForItem(name))
+    }
+    res.WriteString("\n\n")
+    if !queryCategory(name) {
+        res.WriteString("no such category...")
+    } else {
+        res.WriteString(queryItemsForCategory(name))
+    }
+    w.Write([]byte(res.String()))
 
 }
 
@@ -75,8 +89,8 @@ func main() {
     router := mux.NewRouter()
     router.HandleFunc("/ledger/date/{start}", dateStart).Methods("GET")
     router.HandleFunc("/ledger/date/{start}/{end}", dateStartEnd).Methods("GET")
-    router.HandleFunc("/ledger/add/category/{item}/{category}", addCategory).Methods("PUT")
-    router.HandleFunc("/ledger/delete/category/{item}/{category}", deleteCategory).Methods("DELETE")
+    router.HandleFunc("/ledger/category/add/{item}/{category}", addCategory).Methods("PUT")
+    router.HandleFunc("/ledger/category/list/{name}", listCategory).Methods("GET")
 
     log.Fatal(http.ListenAndServe(":8080", router))
 }

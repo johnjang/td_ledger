@@ -68,7 +68,6 @@ func insertCategory(item, category string) {
 }
 
 //QUERY  [GET]
-
 func queryCategoriesForItem(item string) string {
     query := "SELECT category FROM categories where name = ?"
     rows, err := db.Query(query, item)
@@ -87,8 +86,8 @@ func queryCategoriesForItem(item string) string {
         return categoriesString[:len(categoriesString)-2]
     }
     return "None..."
-
 }
+
 
 func queryItemsForCategory(category string) string {
     query := "SELECT name FROM categories where category= ?"
@@ -110,6 +109,22 @@ func queryItemsForCategory(category string) string {
     return "None..."
 }
 
+
+func queryCategory(category string) bool {
+    query := "SELECT * FROM categories where category = ? COLLATE NOCASE"
+    rows, err := db.Query(query, category)
+
+    if handleError(err) {
+        return false
+    }
+
+    res := rowResultCategory(rows, true, true)
+    if len(res) == 0 {
+        return false
+    }
+
+    return true
+}
 
 func queryItem(item string) bool {
     query := "SELECT * FROM items where name = ? COLLATE NOCASE"
