@@ -3,11 +3,11 @@ Description=A personal API service, currently hosting ledger service only
 After=network.target auditd.service
 
 [Service]
-ExecStart=/opt/playground/td_ledger/td_ledger
-ExecStartPre=go build /opt/playground/td_ledger/src/github.com/johnjang/td_ledger
-ExecReload=
-KillMode=
+ExecStartPre=/bin/mkdir -p /var/log/td_ledger
+ExecStart=/bin/td_ledger
 Restart=on-failure
+StandardOutput=td_ledger
+StandardError=td_ledger
 
 [Install]
-Alias=sshd.service
+WantedBy=multi-user.target
