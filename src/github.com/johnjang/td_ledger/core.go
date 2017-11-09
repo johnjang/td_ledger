@@ -2,7 +2,6 @@ package main
 
 import (
     "fmt"
-    //"time"
     "bytes"
     "strconv"
 )
@@ -61,19 +60,50 @@ func dateRangeTable(result [][5]string) string {
 
     table.WriteString(header.String())
     table.WriteString(body.String())
+    table.WriteString("\n\n")
+    table.WriteString(categoryTable(result))
 
     return table.String()
 }
 
 
 
-/*
-func categoryTable([][2]result string) {
+func categoryTable(result [][5]string) string {
+    cmap := make(map[string]float64)
+    var table, header, body bytes.Buffer
 
+    for i:=0; i<len(result); i++ {
+        category := queryCategoriesForItem(result[i][1])
+        _, ok := cmap[category]
+
+        amount := result[i][3]
+        if amount == "0" {
+            amount = result[i][2]
+        }
+        amount_float, err := strconv.ParseFloat(amount, 64)
+        if err != nil {
+            amount_float = 0.0
+        }
+
+        if !ok {
+            cmap[category] = amount_float
+        } else {
+            cmap[category] += amount_float
+        }
+    }
+
+    for k, v := range cmap {
+        body.WriteString(fmt.Sprintf("Category: %s\t\tTotal: %.2f\n", k, v))
+    }
+    header.WriteString("Category spending table...\n")
+    header.WriteString("===============================\n")
+
+    table.WriteString(header.String())
+    table.WriteString(body.String())
+
+    return table.String()
 
 }
-*/
-
 
 
 

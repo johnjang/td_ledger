@@ -52,6 +52,7 @@ func dateStartEnd(w http.ResponseWriter, req *http.Request) {
     w.Write([]byte(result))
 }
 
+
 func addCategory(w http.ResponseWriter, req *http.Request) {
     //add caregory
     item := mux.Vars(req)["item"]
@@ -64,7 +65,7 @@ func addCategory(w http.ResponseWriter, req *http.Request) {
     w.Write([]byte("done"))
 }
 
-func listCategory(w http.ResponseWriter, req *http.Request) {
+func listCategoryAndItem(w http.ResponseWriter, req *http.Request) {
     name := mux.Vars(req)["name"]
 
     var res bytes.Buffer
@@ -80,17 +81,32 @@ func listCategory(w http.ResponseWriter, req *http.Request) {
         res.WriteString(queryItemsForCategory(name))
     }
     w.Write([]byte(res.String()))
-
 }
+
+func listUncategorized(w http.ResponseWriter, req *http.Request) {
+    res := queryUncategorizedItems()
+    var result bytes.Buffer
+    for _, element := range res {
+        result.WriteString(element + "\n")
+    }
+    w.Write([]byte(result.String()))
+}
+
 
 
 func main() {
     fmt.Println("MUX started...")
     router := mux.NewRouter()
-    router.HandleFunc("/ledger/date/{start}", dateStart).Methods("GET")
-    router.HandleFunc("/ledger/date/{start}/{end}", dateStartEnd).Methods("GET")
+
+    //GET
+    router.HandleFunc("/ledger/table/{start}", dateStart).Methods("GET")
+    router.HandleFunc("/ledger/table/{start}/{end}", dateStartEnd).Methods("GET")
+
+    router.HandleFunc("/ledger/list/{name}", listCategoryAndItem).Methods("GET")
+    router.HandleFunc("/ledger/list", listUncategorized).Methods("GET")
+
+    //PUT
     router.HandleFunc("/ledger/category/add/{item}/{category}", addCategory).Methods("PUT")
-    router.HandleFunc("/ledger/category/list/{name}", listCategory).Methods("GET")
 
     log.Fatal(http.ListenAndServe(":8080", router))
 }

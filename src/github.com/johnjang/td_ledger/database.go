@@ -21,8 +21,7 @@ func init() {
 
 /*
 func main() {
-    fmt.Println(queryCategoriesForItem("invalid"))
-    fmt.Println(queryItemsForCategory("invalidd"))
+    fmt.Println(queryUncategorizedItems())
 }
 */
 
@@ -85,7 +84,7 @@ func queryCategoriesForItem(item string) string {
     if len(categoriesString) > 2 {
         return categoriesString[:len(categoriesString)-2]
     }
-    return "None..."
+    return "Uncategorized"
 }
 
 
@@ -109,7 +108,6 @@ func queryItemsForCategory(category string) string {
     return "None..."
 }
 
-
 func queryCategory(category string) bool {
     query := "SELECT * FROM categories where category = ? COLLATE NOCASE"
     rows, err := db.Query(query, category)
@@ -124,6 +122,26 @@ func queryCategory(category string) bool {
     }
 
     return true
+}
+
+func queryUncategorizedItems() []string{
+    var err error
+    var res = []string{}
+
+    query := "select distinct t1.name from items t1 left join categories t2 on t2.name = t1.name where t2.name is null"
+    rows, err := db.Query(query)
+
+    for rows.Next() {
+        var name string
+        err = rows.Scan(&name)
+        if !handleError(err) {
+            res = append(res, name)
+        }
+    }
+
+    rows.Close()
+    return res
+
 }
 
 func queryItem(item string) bool {
