@@ -7,6 +7,7 @@ import (
     "os"
     "strings"
     "strconv"
+    "regexp"
 )
 
 
@@ -28,6 +29,9 @@ func parseLine(line string) {
     dates := parseDateSimple(s_line[0])
 
     name := s_line[1]
+    re := regexp.MustCompile(".*(#.*)")
+    name = re.ReplaceAllString(name, "")
+
     var withdraw float64
     var deposit float64
 

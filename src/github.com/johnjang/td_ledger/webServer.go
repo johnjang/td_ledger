@@ -54,8 +54,9 @@ func dateStartEnd(w http.ResponseWriter, req *http.Request) {
 
 
 func addCategory(w http.ResponseWriter, req *http.Request) {
-    //add caregory
-    item := mux.Vars(req)["item"]
+    //add category 
+    item := strings.Replace(mux.Vars(req)["item"], "_", " ", -1)
+
     if !queryItem(item) {
         w.Write([]byte("Given item not found..."))
         return
@@ -64,6 +65,7 @@ func addCategory(w http.ResponseWriter, req *http.Request) {
 
     w.Write([]byte("done"))
 }
+
 
 func listCategoryAndItem(w http.ResponseWriter, req *http.Request) {
     name := mux.Vars(req)["name"]
